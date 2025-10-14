@@ -4,13 +4,13 @@ backend:
   branch: main               # your main branch
   site_domain: localhost:3000  # the domain where your site is published
 
-media_folder: "public/uploads"   # Where images go (in repo)
-public_folder: "/uploads"        # How they’re accessed from the site
+media_folder: "frontend/public/uploads"   # Where images go (in repo)
+public_folder: "frontend/src/uploads"        # How they’re accessed from the site
 
 collections:
-  - name: "posts"
-    label: "Blog Posts"
-    folder: "content/posts"
+  - name: "products"
+    label: "Products"
+    folder: "frontend/content/products"
     create: true
     slug: "{{slug}}"
     fields:

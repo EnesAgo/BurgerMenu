@@ -1,0 +1,20 @@
+backend:
+  name: github
+  repo: EnesAgo/BurgerMenu      # your GitHub repo (username/repo)
+  branch: main               # your main branch
+  site_domain: localhost:3000  # the domain where your site is published
+
+media_folder: "public/uploads"   # Where images go (in repo)
+public_folder: "/uploads"        # How they’re accessed from the site
+
+collections:
+  - name: "posts"
+    label: "Blog Posts"
+    folder: "content/posts"
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { name: "title", label: "Title", widget: "string" }
+      - { name: "date", label: "Date", widget: "datetime" }
+      - { name: "body", label: "Body", widget: "markdown" }
+      - { name: "image", label: "Image", widget: "image" }

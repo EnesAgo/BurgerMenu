@@ -28,6 +28,12 @@ export const getStaticProps: GetStaticProps = async () => {
 
     // 1️⃣ Fetch all JSON files in the folder
     const listRes = await fetch(`https://api.github.com/repos/${repo}/contents/${path}`);
+
+    if(!listRes.ok) {
+        console.error("Failed to fetch files from GitHub:", listRes.statusText);
+        return { props: { products: [] } };
+    }
+
     const files = await listRes.json();
     console.log(files);
     console.log(1)

@@ -11,7 +11,7 @@ export default function LeftSection() {
                 <h1 className={" z-10 text-[#FEC100] font-[Katibeh] pl-8 text-5xl"}>Drinks</h1>
                 <ul className={" z-10 w-full flex gap-2 justify-between overflow-auto"}>
                     <li className={"flex flex-col items-center justify-center gap-2"}>
-                        <img src="/Heroimages/drink.png" alt="asd" className={"max-h-44"}/>
+                        <img src="/Heroimages/drink.png" alt="asd" className={"max-h-40"}/>
                         <p className={"text-3xl"}>Drink</p>
                     </li>
                     <li className={"flex flex-col items-center justify-center gap-2"}>

@@ -2,9 +2,6 @@
 import { useEffect } from "react";
 
 const Admin = () => {
-
-
-
     useEffect(() => {
         // Only run in the browser
         if (typeof window !== "undefined") {
@@ -19,8 +16,8 @@ const Admin = () => {
                             repo: "EnesAgo/BurgerMenu",
                             branch: "main",
                         },
-                        media_folder: "frontend/public/uploads", // where images are stored in repo
-                        public_folder: "/uploads", // URL path to access images
+                        media_folder: "frontend/public/uploads",
+                        public_folder: "/uploads",
                         collections: [
                             {
                                 name: "products",
@@ -33,6 +30,33 @@ const Admin = () => {
                                     { name: "title", label: "Title", widget: "string" },
                                     { name: "price", label: "Price", widget: "number" },
                                     { name: "description", label: "Description", widget: "text" },
+                                    { name: "image", label: "Image", widget: "image" },
+                                ],
+                            },
+                            {
+                                name: "special-deals",
+                                label: "Special Deals",
+                                folder: "frontend/content/special-deals",
+                                format: "json",
+                                create: true,
+                                slug: "{{slug}}",
+                                fields: [
+                                    { name: "name", label: "Name", widget: "string" },
+                                    { name: "image", label: "Image", widget: "image" },
+                                    { name: "day", label: "Day", widget: "select", options: ["1", "2", "3", "4", "5", "6", "7"] },
+                                ],
+                            },
+                            {
+                                name: "add-ons",
+                                label: "Add-ons & Sides",
+                                folder: "frontend/content/add-ons",
+                                format: "json",
+                                create: true,
+                                slug: "{{slug}}",
+                                fields: [
+                                    { name: "title", label: "Title", widget: "string" },
+                                    { name: "price", label: "Price", widget: "number" },
+                                    { name: "category", label: "Category", widget: "select", options: ["Sides", "Drinks", "Sauces", "Extras"] },
                                     { name: "image", label: "Image", widget: "image" },
                                 ],
                             },

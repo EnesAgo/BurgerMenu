@@ -38,21 +38,33 @@ const fetchDataFromGitHub = async (path: string): Promise<any[]> => {
     try {
         const listRes = await fetch(`https://api.github.com/repos/${repo}/contents/${path}`);
 
+        // Handle 404 errors (folder doesn't exist or is empty in GitHub)
+        if (listRes.status === 404) {
+            console.log(`Folder ${path} not found in GitHub repository (likely empty)`);
+            return [];
+        }
+
         if (!listRes.ok) {
-            console.error(`Failed to fetch files from GitHub path ${path}:`, listRes.statusText);
+            console.error(`Failed to fetch files from GitHub path ${path}:`, listRes.status, listRes.statusText);
             return [];
         }
 
         const files = await listRes.json();
 
+        // Filter out .gitkeep files and only process .json files
+        const jsonFiles = files.filter((file: any) => file.name.endsWith(".json"));
+
+        if (jsonFiles.length === 0) {
+            console.log(`No JSON files found in ${path}`);
+            return [];
+        }
+
         const data = await Promise.all(
-            files
-                .filter((file: any) => file.name.endsWith(".json"))
-                .map(async (file: any) => {
-                    const res = await fetch(file.download_url);
-                    const data = await res.json();
-                    return { ...data, slug: file.name.replace(".json", "") };
-                })
+            jsonFiles.map(async (file: any) => {
+                const res = await fetch(file.download_url);
+                const data = await res.json();
+                return { ...data, slug: file.name.replace(".json", "") };
+            })
         );
 
         return data;

@@ -1,9 +1,13 @@
 import React from "react";
+import HeroImages from "@/components/leftSectionComponents/HeroImages";
 
-export default function LeftSection() {
+export default function LeftSection({products, specialDeals}: any) {
+    console.log("products and specialDeals in the LeftSection:", products, specialDeals);
+
     return (
         <div className={"h-full flex flex-col justify-between items-stretch max-w-[40%] [@media(min-width:1600px)]:max-w-[50%]"}>
-            <img src="/Heroimages/HeroImage.png" alt="asd" className={"z-10 w-full h-auto object-contain"}/>
+            {/*<img src="/Heroimages/HeroImage.png" alt="asd" className={"z-10 w-full h-auto object-contain"}/>*/}
+            <HeroImages className={"z-10 w-full h-auto object-contain"} />
 
             <div className={"w-full h-full p-8 gap-5 flex flex-col justify-around "}>
                 <div className="hidden absolute bottom-[-35%] left-[-50%] h-[100%] w-[100%] aspect-[2] bg-[#328C201A] blur-xs rounded-full z-0"></div>

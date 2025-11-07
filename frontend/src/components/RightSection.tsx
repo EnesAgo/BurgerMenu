@@ -1,7 +1,10 @@
 import React from "react";
 
 
-export default function RightSection() {
+export default function RightSection({addOns}: any) {
+
+    console.log("addOns in the RightSection:", addOns);
+
     return (
         <div className={"flex-1 h-full flex-col"}>
             <div className={"flex w-full h-[80%] pb-5"}>

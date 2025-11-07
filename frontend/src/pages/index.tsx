@@ -10,26 +10,42 @@ interface Product {
     slug: string;
 }
 
-interface HomeProps {
-    products: Product[];
+interface SpecialDeal {
+    name: string;
+    image: string;
+    day: string;
+    slug: string;
 }
 
-// Helper function to fetch products from GitHub API
-const fetchProducts = async (): Promise<Product[]> => {
+interface AddOn {
+    title: string;
+    price: number;
+    category: string;
+    image: string;
+    slug: string;
+}
+
+interface HomeProps {
+    products: Product[];
+    specialDeals: SpecialDeal[];
+    addOns: AddOn[];
+}
+
+// Helper function to fetch data from GitHub API
+const fetchDataFromGitHub = async (path: string): Promise<any[]> => {
     const repo = "EnesAgo/BurgerMenu";
-    const path = "frontend/content/products";
 
     try {
         const listRes = await fetch(`https://api.github.com/repos/${repo}/contents/${path}`);
 
         if (!listRes.ok) {
-            console.error("Failed to fetch files from GitHub:", listRes.statusText);
+            console.error(`Failed to fetch files from GitHub path ${path}:`, listRes.statusText);
             return [];
         }
 
         const files = await listRes.json();
 
-        const products = await Promise.all(
+        const data = await Promise.all(
             files
                 .filter((file: any) => file.name.endsWith(".json"))
                 .map(async (file: any) => {
@@ -39,33 +55,65 @@ const fetchProducts = async (): Promise<Product[]> => {
                 })
         );
 
-        return products;
+        return data;
     } catch (error) {
-        console.error("Error fetching products:", error);
+        console.error(`Error fetching data from ${path}:`, error);
         return [];
     }
 };
 
-export default function Home({ products: initialProducts }: HomeProps) {
+// Specific fetch functions for each collection
+const fetchProducts = async (): Promise<Product[]> => {
+    return await fetchDataFromGitHub("frontend/content/products");
+};
+
+const fetchSpecialDeals = async (): Promise<SpecialDeal[]> => {
+    return await fetchDataFromGitHub("frontend/content/special-deals");
+};
+
+const fetchAddOns = async (): Promise<AddOn[]> => {
+    return await fetchDataFromGitHub("frontend/content/add-ons");
+};
+
+export default function Home({ products: initialProducts, specialDeals: initialSpecialDeals, addOns: initialAddOns }: HomeProps) {
     const [products, setProducts] = useState<Product[]>(initialProducts);
+    const [specialDeals, setSpecialDeals] = useState<SpecialDeal[]>(initialSpecialDeals);
+    const [addOns, setAddOns] = useState<AddOn[]>(initialAddOns);
 
     useEffect(() => {
         console.log("Current products:", products);
+        console.log("Current special deals:", specialDeals);
+        console.log("Current add-ons:", addOns);
 
         // Fetch fresh data immediately on mount
-        const updateProducts = async () => {
-            const freshProducts = await fetchProducts();
+        const updateAllData = async () => {
+            const [freshProducts, freshSpecialDeals, freshAddOns] = await Promise.all([
+                fetchProducts(),
+                fetchSpecialDeals(),
+                fetchAddOns()
+            ]);
+
             if (freshProducts.length > 0) {
                 setProducts(freshProducts);
                 console.log("Updated products:", freshProducts);
             }
+
+            if (freshSpecialDeals.length >= 0) { // Allow empty arrays
+                setSpecialDeals(freshSpecialDeals);
+                console.log("Updated special deals:", freshSpecialDeals);
+            }
+
+            if (freshAddOns.length >= 0) { // Allow empty arrays
+                setAddOns(freshAddOns);
+                console.log("Updated add-ons:", freshAddOns);
+            }
         };
 
         // Initial fetch
-        updateProducts();
+        updateAllData();
 
         // Set up interval to fetch every 60 seconds
-        const interval = setInterval(updateProducts, 60000); // 60 seconds
+        const interval = setInterval(updateAllData, 60000); // 60 seconds
 
         // Cleanup interval on unmount
         return () => clearInterval(interval);
@@ -73,16 +121,20 @@ export default function Home({ products: initialProducts }: HomeProps) {
 
     return (
         <main className={"w-[100%] h-[100%] bg-[#393D47]"}>
-            <HomePage />
+            <HomePage products={products} specialDeals={specialDeals} addOns={addOns} />
         </main>
     );
 }
 
 export const getStaticProps: GetStaticProps = async () => {
-    const products = await fetchProducts();
+    const [products, specialDeals, addOns] = await Promise.all([
+        fetchProducts(),
+        fetchSpecialDeals(),
+        fetchAddOns()
+    ]);
 
     return {
-        props: { products },
+        props: { products, specialDeals, addOns },
         revalidate: 60, // Regenerate every minute (ISR) - fallback for SEO
     };
 };

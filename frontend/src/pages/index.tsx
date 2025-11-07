@@ -31,17 +31,43 @@ interface HomeProps {
     addOns: AddOn[];
 }
 
-// Helper function to fetch data from GitHub API
-const fetchDataFromGitHub = async (path: string): Promise<any[]> => {
+// Helper function to fetch data from GitHub API with retry logic
+const fetchDataFromGitHub = async (path: string, retryCount = 0): Promise<any[]> => {
     const repo = "EnesAgo/BurgerMenu";
+    const maxRetries = 3;
 
     try {
-        const listRes = await fetch(`https://api.github.com/repos/${repo}/contents/${path}`);
+        const listRes = await fetch(`https://api.github.com/repos/${repo}/contents/${path}`, {
+            headers: {
+                'Accept': 'application/vnd.github.v3+json',
+                'User-Agent': 'BurgerMenu-App'
+            }
+        });
 
         // Handle 404 errors (folder doesn't exist or is empty in GitHub)
         if (listRes.status === 404) {
             console.log(`Folder ${path} not found in GitHub repository (likely empty)`);
             return [];
+        }
+
+        // Handle 403 errors (rate limiting or permissions)
+        if (listRes.status === 403) {
+            const rateLimitRemaining = listRes.headers.get('X-RateLimit-Remaining');
+            const resetTime = listRes.headers.get('X-RateLimit-Reset');
+
+            console.warn(`GitHub API rate limit hit for ${path}. Remaining: ${rateLimitRemaining}, Reset: ${resetTime}`);
+
+            // Retry with exponential backoff if we haven't exceeded max retries
+            if (retryCount < maxRetries) {
+                const delay = Math.pow(2, retryCount) * 1000; // 1s, 2s, 4s delays
+                console.log(`Retrying ${path} in ${delay}ms (attempt ${retryCount + 1}/${maxRetries})`);
+
+                await new Promise(resolve => setTimeout(resolve, delay));
+                return fetchDataFromGitHub(path, retryCount + 1);
+            } else {
+                console.error(`Max retries exceeded for ${path}. Returning empty array.`);
+                return [];
+            }
         }
 
         if (!listRes.ok) {
@@ -61,15 +87,36 @@ const fetchDataFromGitHub = async (path: string): Promise<any[]> => {
 
         const data = await Promise.all(
             jsonFiles.map(async (file: any) => {
-                const res = await fetch(file.download_url);
-                const data = await res.json();
-                return { ...data, slug: file.name.replace(".json", "") };
+                try {
+                    const res = await fetch(file.download_url);
+                    if (!res.ok) {
+                        console.error(`Failed to fetch file ${file.name}:`, res.status);
+                        return null;
+                    }
+                    const data = await res.json();
+                    return { ...data, slug: file.name.replace(".json", "") };
+                } catch (error) {
+                    console.error(`Error parsing JSON file ${file.name}:`, error);
+                    return null;
+                }
             })
         );
 
-        return data;
+        // Filter out null results from failed file downloads
+        return data.filter(item => item !== null);
+
     } catch (error) {
         console.error(`Error fetching data from ${path}:`, error);
+
+        // Retry on network errors if we haven't exceeded max retries
+        if (retryCount < maxRetries) {
+            const delay = Math.pow(2, retryCount) * 1000;
+            console.log(`Network error for ${path}. Retrying in ${delay}ms`);
+
+            await new Promise(resolve => setTimeout(resolve, delay));
+            return fetchDataFromGitHub(path, retryCount + 1);
+        }
+
         return [];
     }
 };

@@ -1,8 +1,6 @@
 import React from "react";
 import HeroImages from "@/components/leftSectionComponents/HeroImages";
-
-import { Swiper, SwiperSlide } from 'swiper/react';
-import { Navigation, Pagination, Scrollbar, A11y, Autoplay } from 'swiper/modules';
+import AddOnsSwiper from "@/components/leftSectionComponents/AddOnsSwiper";
 
 interface Product {
     title: string;
@@ -41,29 +39,8 @@ export default function LeftSection({addOns, fixedProducts, specialDeals}: LeftS
             <div className={"flex-[3] w-full p-8 gap-5 flex flex-col justify-around "}>
                 <div className="hidden absolute bottom-[-35%] left-[-50%] h-[100%] w-[100%] aspect-[2] bg-[#328C201A] blur-xs rounded-full z-0"></div>
 
-                <h1 className={" z-10 text-[#FEC100] font-[Katibeh] pl-8 text-5xl"}>Drinks</h1>
-                <ul className={" z-10 w-full flex gap-2 justify-between overflow-auto"}>
-                    <li className={"flex flex-col items-center justify-center gap-2"}>
-                        <img src="/Heroimages/drink.png" alt="asd" className={"max-h-40"}/>
-                        <p className={"text-3xl"}>Drink</p>
-                    </li>
-                    <li className={"flex flex-col items-center justify-center gap-2"}>
-                        <img src="/Heroimages/drink2.png" alt="asd" className={"max-h-44"}/>
-                        <p className={"text-3xl"}>Drink</p>
-                    </li>
-                    <li className={"flex flex-col items-center justify-center gap-2"}>
-                        <img src="/Heroimages/drink3.png" alt="asd" className={"max-h-44"}/>
-                        <p className={"text-3xl"}>Drink</p>
-                    </li>
-                    <li className={"flex flex-col items-center justify-center gap-2"}>
-                        <img src="/Heroimages/drink.png" alt="asd" className={"max-h-44"}/>
-                        <p className={"text-3xl"}>Drink</p>
-                    </li>
-                    <li className={"flex flex-col items-center justify-center gap-2"}>
-                        <img src="/Heroimages/drink.png" alt="asd" className={"max-h-44"}/>
-                        <p className={"text-3xl"}>Drink</p>
-                    </li>
-                </ul>
+                <h1 className={" z-10 text-[#FEC100] font-[Katibeh] pl-8 text-5xl"}>Add-ons</h1>
+                <AddOnsSwiper addOns={addOns} className="" />
             </div>
         </div>
     );

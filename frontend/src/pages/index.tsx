@@ -1,6 +1,8 @@
 import { GetStaticProps } from "next";
 import HomePage from "@/components/HomePage";
 import { useEffect, useState } from "react";
+import fs from "fs";
+import path from "path";
 
 interface Product {
     title: string;
@@ -32,116 +34,64 @@ interface HomeProps {
     addOns: AddOn[];
 }
 
-// Helper function to fetch data from GitHub API with retry logic
-const fetchDataFromGitHub = async (path: string, retryCount = 0): Promise<any[]> => {
-    const repo = "EnesAgo/BurgerMenu";
-    const maxRetries = 3;
-
+// Helper function to read data from local filesystem
+const fetchDataFromLocalFS = async (folderPath: string): Promise<any[]> => {
     try {
-        const listRes = await fetch(`https://api.github.com/repos/${repo}/contents/${path}`, {
-            headers: {
-                'Accept': 'application/vnd.github.v3+json',
-                'User-Agent': 'BurgerMenu-App'
+        const fullPath = path.join(process.cwd(), folderPath);
+
+        // Check if the directory exists
+        if (!fs.existsSync(fullPath)) {
+            console.log(`Folder ${folderPath} not found locally`);
+            return [];
+        }
+
+        const files = fs.readdirSync(fullPath);
+        const jsonFiles = files.filter((file) => file.endsWith(".json"));
+
+        if (jsonFiles.length === 0) {
+            console.log(`No JSON files found in ${folderPath}`);
+            return [];
+        }
+
+        const data = jsonFiles.map((file) => {
+            try {
+                const filePath = path.join(fullPath, file);
+                const fileContent = fs.readFileSync(filePath, "utf-8");
+                const jsonData = JSON.parse(fileContent);
+                return { ...jsonData, slug: file.replace(".json", "") };
+            } catch (error) {
+                console.error(`Error parsing JSON file ${file}:`, error);
+                return null;
             }
         });
 
-        // Handle 404 errors (folder doesn't exist or is empty in GitHub)
-        if (listRes.status === 404) {
-            console.log(`Folder ${path} not found in GitHub repository (likely empty)`);
-            return [];
-        }
-
-        // Handle 403 errors (rate limiting or permissions)
-        if (listRes.status === 403) {
-            const rateLimitRemaining = listRes.headers.get('X-RateLimit-Remaining');
-            const resetTime = listRes.headers.get('X-RateLimit-Reset');
-
-            console.warn(`GitHub API rate limit hit for ${path}. Remaining: ${rateLimitRemaining}, Reset: ${resetTime}`);
-
-            // Retry with exponential backoff if we haven't exceeded max retries
-            if (retryCount < maxRetries) {
-                const delay = Math.pow(2, retryCount) * 1000; // 1s, 2s, 4s delays
-                console.log(`Retrying ${path} in ${delay}ms (attempt ${retryCount + 1}/${maxRetries})`);
-
-                await new Promise(resolve => setTimeout(resolve, delay));
-                return fetchDataFromGitHub(path, retryCount + 1);
-            } else {
-                console.error(`Max retries exceeded for ${path}. Returning empty array.`);
-                return [];
-            }
-        }
-
-        if (!listRes.ok) {
-            console.error(`Failed to fetch files from GitHub path ${path}:`, listRes.status, listRes.statusText);
-            return [];
-        }
-
-        const files = await listRes.json();
-
-        // Filter out .gitkeep files and only process .json files
-        const jsonFiles = files.filter((file: any) => file.name.endsWith(".json"));
-
-        if (jsonFiles.length === 0) {
-            console.log(`No JSON files found in ${path}`);
-            return [];
-        }
-
-        const data = await Promise.all(
-            jsonFiles.map(async (file: any) => {
-                try {
-                    const res = await fetch(file.download_url);
-                    if (!res.ok) {
-                        console.error(`Failed to fetch file ${file.name}:`, res.status);
-                        return null;
-                    }
-                    const data = await res.json();
-                    return { ...data, slug: file.name.replace(".json", "") };
-                } catch (error) {
-                    console.error(`Error parsing JSON file ${file.name}:`, error);
-                    return null;
-                }
-            })
-        );
-
-        // Filter out null results from failed file downloads
-        return data.filter(item => item !== null);
-
+        return data.filter((item) => item !== null);
     } catch (error) {
-        console.error(`Error fetching data from ${path}:`, error);
-
-        // Retry on network errors if we haven't exceeded max retries
-        if (retryCount < maxRetries) {
-            const delay = Math.pow(2, retryCount) * 1000;
-            console.log(`Network error for ${path}. Retrying in ${delay}ms`);
-
-            await new Promise(resolve => setTimeout(resolve, delay));
-            return fetchDataFromGitHub(path, retryCount + 1);
-        }
-
+        console.error(`Error reading data from ${folderPath}:`, error);
         return [];
     }
 };
 
 // Specific fetch functions for each collection
 const fetchProducts = async (): Promise<Product[]> => {
-    return await fetchDataFromGitHub("frontend/content/products");
+    return await fetchDataFromLocalFS("content/products");
 };
 
 const fetchFixedProducts = async (): Promise<Product[]> => {
-    return await fetchDataFromGitHub("frontend/content/fixedProducts");
+    return await fetchDataFromLocalFS("content/fixedProducts");
 };
 
 const fetchSpecialDeals = async (): Promise<SpecialDeal[]> => {
-    return await fetchDataFromGitHub("frontend/content/special-deals");
+    return await fetchDataFromLocalFS("content/special-deals");
 };
 
 const fetchAddOns = async (): Promise<AddOn[]> => {
-    return await fetchDataFromGitHub("frontend/content/add-ons");
+    return await fetchDataFromLocalFS("content/add-ons");
 };
 
-export default function Home({ products: initialProducts, specialDeals: initialSpecialDeals, addOns: initialAddOns }: HomeProps) {
+export default function Home({ products: initialProducts, fixedProducts: initialFixedProducts, specialDeals: initialSpecialDeals, addOns: initialAddOns }: HomeProps) {
     const [products, setProducts] = useState<Product[]>(initialProducts);
-    const [fixedProducts, setFixedProducts] = useState<Product[]>([]);
+    const [fixedProducts, setFixedProducts] = useState<Product[]>(initialFixedProducts || []);
     const [specialDeals, setSpecialDeals] = useState<SpecialDeal[]>(initialSpecialDeals);
     const [addOns, setAddOns] = useState<AddOn[]>(initialAddOns);
 
@@ -151,43 +101,27 @@ export default function Home({ products: initialProducts, specialDeals: initialS
         console.log("Current special deals:", specialDeals);
         console.log("Current add-ons:", addOns);
 
-        // Fetch fresh data immediately on mount
+        // Fetch fresh data via API route every 60 seconds
         const updateAllData = async () => {
-            const [freshProducts, freshFixedProducts, freshSpecialDeals, freshAddOns] = await Promise.all([
-                fetchProducts(),
-                fetchFixedProducts(),
-                fetchSpecialDeals(),
-                fetchAddOns()
-            ]);
-
-            if (freshProducts.length > 0) {
-                setProducts(freshProducts);
-                console.log("Updated products:", freshProducts);
-            }
-
-            if (freshFixedProducts.length >= 0) {
-                setFixedProducts(freshFixedProducts);
-                console.log("Updated fixed products:", freshFixedProducts);
-            }
-
-            if (freshSpecialDeals.length >= 0) {
-                setSpecialDeals(freshSpecialDeals);
-                console.log("Updated special deals:", freshSpecialDeals);
-            }
-
-            if (freshAddOns.length >= 0) {
-                setAddOns(freshAddOns);
-                console.log("Updated add-ons:", freshAddOns);
+            try {
+                const response = await fetch('/api/content');
+                if (response.ok) {
+                    const data = await response.json();
+                    setProducts(data.products || []);
+                    setFixedProducts(data.fixedProducts || []);
+                    setSpecialDeals(data.specialDeals || []);
+                    setAddOns(data.addOns || []);
+                    console.log("Updated data from API");
+                }
+            } catch (error) {
+                console.error("Error fetching fresh data:", error);
             }
         };
-
-        // Initial fetch
-        updateAllData();
 
         // Set up interval to fetch every 60 seconds
         const interval = setInterval(updateAllData, 60000); // 60 seconds
 
-        // Cleanup interval on unmount
+        // Cleanup interval on unmounting
         return () => clearInterval(interval);
     }, []);
 
@@ -218,6 +152,6 @@ export const getStaticProps: GetStaticProps = async () => {
             specialDeals,
             addOns
         },
-        revalidate: 60, // Regenerate every minute (ISR) - fallback for SEO
+        revalidate: 60, // Regenerate every minute (ISR)
     };
 };

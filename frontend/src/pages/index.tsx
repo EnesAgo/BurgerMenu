@@ -27,6 +27,7 @@ interface AddOn {
 
 interface HomeProps {
     products: Product[];
+    fixedProducts?: Product[];
     specialDeals: SpecialDeal[];
     addOns: AddOn[];
 }
@@ -126,6 +127,10 @@ const fetchProducts = async (): Promise<Product[]> => {
     return await fetchDataFromGitHub("frontend/content/products");
 };
 
+const fetchFixedProducts = async (): Promise<Product[]> => {
+    return await fetchDataFromGitHub("frontend/content/fixedProducts");
+};
+
 const fetchSpecialDeals = async (): Promise<SpecialDeal[]> => {
     return await fetchDataFromGitHub("frontend/content/special-deals");
 };
@@ -136,18 +141,21 @@ const fetchAddOns = async (): Promise<AddOn[]> => {
 
 export default function Home({ products: initialProducts, specialDeals: initialSpecialDeals, addOns: initialAddOns }: HomeProps) {
     const [products, setProducts] = useState<Product[]>(initialProducts);
+    const [fixedProducts, setFixedProducts] = useState<Product[]>([]);
     const [specialDeals, setSpecialDeals] = useState<SpecialDeal[]>(initialSpecialDeals);
     const [addOns, setAddOns] = useState<AddOn[]>(initialAddOns);
 
     useEffect(() => {
         console.log("Current products:", products);
+        console.log("Current fixed products:", fixedProducts);
         console.log("Current special deals:", specialDeals);
         console.log("Current add-ons:", addOns);
 
         // Fetch fresh data immediately on mount
         const updateAllData = async () => {
-            const [freshProducts, freshSpecialDeals, freshAddOns] = await Promise.all([
+            const [freshProducts, freshFixedProducts, freshSpecialDeals, freshAddOns] = await Promise.all([
                 fetchProducts(),
+                fetchFixedProducts(),
                 fetchSpecialDeals(),
                 fetchAddOns()
             ]);
@@ -157,12 +165,17 @@ export default function Home({ products: initialProducts, specialDeals: initialS
                 console.log("Updated products:", freshProducts);
             }
 
-            if (freshSpecialDeals.length >= 0) { // Allow empty arrays
+            if (freshFixedProducts.length >= 0) {
+                setFixedProducts(freshFixedProducts);
+                console.log("Updated fixed products:", freshFixedProducts);
+            }
+
+            if (freshSpecialDeals.length >= 0) {
                 setSpecialDeals(freshSpecialDeals);
                 console.log("Updated special deals:", freshSpecialDeals);
             }
 
-            if (freshAddOns.length >= 0) { // Allow empty arrays
+            if (freshAddOns.length >= 0) {
                 setAddOns(freshAddOns);
                 console.log("Updated add-ons:", freshAddOns);
             }
@@ -179,21 +192,32 @@ export default function Home({ products: initialProducts, specialDeals: initialS
     }, []);
 
     return (
-        <main className={"w-[100%] h-[100%] bg-[#393D47]"}>
-            <HomePage products={products} specialDeals={specialDeals} addOns={addOns} />
+        <main className={"w-[100%] h-screen bg-[#393D47]"}>
+            <HomePage
+                products={products}
+                fixedProducts={fixedProducts}
+                specialDeals={specialDeals}
+                addOns={addOns}
+            />
         </main>
     );
 }
 
 export const getStaticProps: GetStaticProps = async () => {
-    const [products, specialDeals, addOns] = await Promise.all([
+    const [products, fixedProducts, specialDeals, addOns] = await Promise.all([
         fetchProducts(),
+        fetchFixedProducts(),
         fetchSpecialDeals(),
         fetchAddOns()
     ]);
 
     return {
-        props: { products, specialDeals, addOns },
+        props: {
+            products,
+            fixedProducts,
+            specialDeals,
+            addOns
+        },
         revalidate: 60, // Regenerate every minute (ISR) - fallback for SEO
     };
 };

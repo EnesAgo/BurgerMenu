@@ -34,6 +34,20 @@ const Admin = () => {
                                 ],
                             },
                             {
+                                name: "FixedProducts",
+                                label: "Fixed Products",
+                                folder: "frontend/content/fixedProducts",
+                                format: "json",
+                                create: true,
+                                slug: "{{slug}}",
+                                fields: [
+                                    { name: "title", label: "Title", widget: "string" },
+                                    { name: "price", label: "Price", widget: "number" },
+                                    { name: "description", label: "Description", widget: "text" },
+                                    { name: "image", label: "Image", widget: "image" },
+                                ],
+                            },
+                            {
                                 name: "special-deals",
                                 label: "Special Deals",
                                 folder: "frontend/content/special-deals",

@@ -1,12 +1,33 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination, Scrollbar, A11y, Autoplay } from 'swiper/modules';
 
-function HeroImages({className}: {className?: string}) {
-    return (
-        <div className={className} >
-            {/*<img src="/Heroimages/HeroImage.png"/>*/}
+function HeroImages({className, specialDeals}: any) {
+    const [deals, setDeals] = useState<any>(specialDeals.specialDeals)
+    const [todayDeals, setTodayDeals] = useState<any[]>([]);
 
+    useEffect(() => {
+        const today = new Date();
+        const todaysDay = today.getDay(); // 0 (Sunday) to 6 (Saturday)
+
+        // Convert numeric day to string (1-7 format)
+        const dayToString = (day: number): string => {
+            // Convert Sunday (0) to 7 to match the data format
+            const adjustedDay = day === 0 ? "7" : day.toString();
+            return adjustedDay;
+        };
+
+        // Filter deals for today
+        if (deals && Array.isArray(deals)) {
+            const todaysSpecials = deals.filter((deal: any) => deal.day === dayToString(todaysDay));
+            setTodayDeals(todaysSpecials);
+        }
+
+        console.log(todayDeals)
+    }, [specialDeals, deals]);
+
+    return (
+        <div className={`${className} overflow-hidden`} >
             <Swiper
                 spaceBetween={30}
                 centeredSlides={true}
@@ -18,13 +39,21 @@ function HeroImages({className}: {className?: string}) {
                     clickable: true,
                 }}
                 loop={true}
-
                 modules={[Autoplay, Pagination, Navigation]}
-                className="mySwiper"
+                className="mySwiper h-[100%]"
             >
+                {todayDeals.length > 0 ? (
+                    todayDeals.map((deal: any, index: number) => (
+                        <SwiperSlide key={index} className="">
+                            <img className="w-full h-full object-contain" src={deal.image} alt={deal.name} />
+                        </SwiperSlide>
+                    ))
+                ) : (
 
-                <SwiperSlide><img src="/Heroimages/HeroImage.png"/></SwiperSlide>
-                <SwiperSlide><img src="/Heroimages/drink.png"/></SwiperSlide>
+                    <SwiperSlide className="">
+                        {/*{todayDeals.length>0 && todayDeals.map((e)=> <img className={"max-h-[40%]"} src={e.image}alt="Default Hero" />)}*/}
+                    </SwiperSlide>
+                )}
             </Swiper>
         </div>
     );

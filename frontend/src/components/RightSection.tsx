@@ -24,17 +24,21 @@ export default function RightSection({products, fixedProducts}: any) {
                 </div>
 
 
-                <div className={"flex flex-col w-[50%]"}>
-                    {fixed4Products && fixed4Products.length>0 && fixed4Products.map((product: any, index: number) => (
-                        <div className={"flex w-full h-[25%] p-2 gap-2  items-center gap-2"}>
-                            <img src={product.image} alt="LogoHalal" className={"h-auto w-[35%]"}/>
-                            <div className={"flex flex-col"}>
-                                <h2 className={"text-[#FEC100] text-2xl"}>{product.title}</h2>
-                                <p className={"text-white"}>{product.description}</p>
-                            </div>
-                        </div>
-                    ))}
+
+                <div className="w-1/2 h-full">
+                    <ProductShow products={fixedProducts}/>
                 </div>
+                {/*<div className={"flex flex-col w-[50%]"}>*/}
+                {/*    {fixed4Products && fixed4Products.length>0 && fixed4Products.map((product: any, index: number) => (*/}
+                {/*        <div className={"flex w-full h-[25%] p-2 gap-2  items-center gap-2"}>*/}
+                {/*            <img src={product.image} alt="LogoHalal" className={"h-auto w-[35%]"}/>*/}
+                {/*            <div className={"flex flex-col"}>*/}
+                {/*                <h2 className={"text-[#FEC100] text-2xl"}>{product.title}</h2>*/}
+                {/*                <p className={"text-white"}>{product.description}</p>*/}
+                {/*            </div>*/}
+                {/*        </div>*/}
+                {/*    ))}*/}
+                {/*</div>*/}
 
             </div>
 

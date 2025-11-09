@@ -1,6 +1,6 @@
 import React from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { Navigation, Pagination, Scrollbar, A11y } from 'swiper/modules';
+import { Navigation, Pagination, Scrollbar, A11y, Autoplay } from 'swiper/modules';
 
 interface AddOn {
     title: string;
@@ -26,7 +26,7 @@ function AddOnsSwiper({ addOns, className }: AddOnsSwiperProps) {
                     disableOnInteraction: false,
                 }}
                 loop={true}
-                modules={[Navigation, Pagination, Scrollbar, A11y]}
+                modules={[Autoplay,Navigation, Pagination, Scrollbar, A11y]}
                 className="addOnsSwiper"
                 breakpoints={{
                     320: {

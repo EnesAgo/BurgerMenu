@@ -1,6 +1,6 @@
 import React from "react";
-import LeftSection from "@/components/LeftSection";
-import RightSection from "@/components/RightSection";
+import TopSection from "@/components/TopSection";
+import BotSection from "@/components/BotSection";
 
 interface Product {
     title: string;
@@ -34,10 +34,10 @@ interface HomePageProps {
 
 export default function HomePage({ products, fixedProducts, specialDeals, addOns }: HomePageProps) {
     return (
-        <div style={{ backgroundImage: "url('/hamburgerVectors.svg')" }} className={"w-full h-screen bg-cover flex items-center justify-center"}>
-            <LeftSection addOns={addOns} specialDeals={{ specialDeals }} />
-
-            <RightSection products={products} fixedProducts={fixedProducts}  />
+        <div style={{ backgroundImage: "url('/Background.png')" }} className={"w-full h-screen bg-cover flex flex-col items-center justify-center"}>
+            <TopSection addOns={addOns} fixedProducts={fixedProducts} specialDeals={{ specialDeals }} />
+            {/*<div className={"w-full h-[5%]"}></div>*/}
+            <BotSection addOns={addOns} fixedProducts={fixedProducts} specialDeals={{ specialDeals }} />
         </div>
     );
 }

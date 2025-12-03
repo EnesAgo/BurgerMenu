@@ -12,12 +12,10 @@ function HeroImages({className, specialDeals}: any) {
 
         // Convert numeric day to string (1-7 format)
         const dayToString = (day: number): string => {
-            // Convert Sunday (0) to 7 to match the data format
             const adjustedDay = day === 0 ? "7" : day.toString();
             return adjustedDay;
         };
 
-        // Filter deals for today
         if (deals && Array.isArray(deals)) {
             const todaysSpecials = deals.filter((deal: any) => deal.day === dayToString(todaysDay));
             setTodayDeals(todaysSpecials);
@@ -40,12 +38,12 @@ function HeroImages({className, specialDeals}: any) {
                 }}
                 loop={true}
                 modules={[Autoplay, Pagination, Navigation]}
-                className="mySwiper h-[100%]"
+                className="mySwiper h-[100%] w-full"
             >
                 {todayDeals.length > 0 ? (
                     todayDeals.map((deal: any, index: number) => (
-                        <SwiperSlide key={index} className="">
-                            <img className="w-full h-full object-contain" src={deal.image} alt={deal.name} />
+                        <SwiperSlide key={index} className="flex items-center justify-start">
+                            <img className="w-full h-full object-contain object-top-left" src={deal.image} alt={deal.name} />
                         </SwiperSlide>
                     ))
                 ) : (

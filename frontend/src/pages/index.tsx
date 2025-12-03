@@ -34,12 +34,10 @@ interface HomeProps {
     addOns: AddOn[];
 }
 
-// Helper function to read data from local filesystem
 const fetchDataFromLocalFS = async (folderPath: string): Promise<any[]> => {
     try {
         const fullPath = path.join(process.cwd(), folderPath);
 
-        // Check if the directory exists
         if (!fs.existsSync(fullPath)) {
             console.log(`Folder ${folderPath} not found locally`);
             return [];
@@ -72,7 +70,6 @@ const fetchDataFromLocalFS = async (folderPath: string): Promise<any[]> => {
     }
 };
 
-// Specific fetch functions for each collection
 const fetchProducts = async (): Promise<Product[]> => {
     return await fetchDataFromLocalFS("content/products");
 };
@@ -101,7 +98,6 @@ export default function Home({ products: initialProducts, fixedProducts: initial
         console.log("Current special deals:", specialDeals);
         console.log("Current add-ons:", addOns);
 
-        // Fetch fresh data via API route every 60 seconds
         const updateAllData = async () => {
             try {
                 const response = await fetch('/api/content');
@@ -121,7 +117,6 @@ export default function Home({ products: initialProducts, fixedProducts: initial
         // Set up interval to fetch every 60 seconds
         const interval = setInterval(updateAllData, 60000); // 60 seconds
 
-        // Cleanup interval on unmounting
         return () => clearInterval(interval);
     }, []);
 
@@ -152,6 +147,6 @@ export const getStaticProps: GetStaticProps = async () => {
             specialDeals,
             addOns
         },
-        revalidate: 60, // Regenerate every minute (ISR)
+        revalidate: 60, // Regenerate every minute
     };
 };

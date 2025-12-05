@@ -53,3 +53,19 @@ collections:
       - { name: price, label: Price, widget: number }
       - { name: category, label: Category, widget: select, options: ["Sides", "Drinks", "Sauces", "Extras"] }
       - { name: image, label: Image, widget: image }
+
+  - name: menu
+    label: "Menu (Burger + Combo)"
+    folder: "frontend/content/menu"
+    format: "json"
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { name: burgerTitle, label: "Burger Title", widget: string }
+      - { name: burgerPrice, label: "Burger Price", widget: number }
+      - { name: burgerDescription, label: "Burger Description", widget: text }
+      - { name: burgerImage, label: "Burger Image", widget: image }
+      - { name: menuPrice, label: "Menu Price (Burger + Sides)", widget: number }
+      - { name: menuDescription, label: "Menu Description", widget: text }
+      - { name: menuImage, label: "Menu Image", widget: image }
+

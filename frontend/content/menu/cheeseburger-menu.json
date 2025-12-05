@@ -1,0 +1,9 @@
+{
+  "burgerTitle": "Classic Cheeseburger",
+  "burgerPrice": 6.99,
+  "burgerDescription": "Juicy beef patty with melted cheese, lettuce, tomato, and our special sauce",
+  "burgerImage": "/uploads/hamburger.png",
+  "menuPrice": 9.99,
+  "menuDescription": "Complete meal with burger, fries, and a drink",
+  "menuImage": "/uploads/hamburger.png"
+}

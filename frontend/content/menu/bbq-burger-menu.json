@@ -1,0 +1,9 @@
+{
+  "burgerTitle": "BBQ Burger",
+  "burgerPrice": 7.99,
+  "burgerDescription": "Smoky BBQ sauce, bacon, cheddar cheese, onion rings on a beef patty",
+  "burgerImage": "/uploads/single_bbq_burger-min.png",
+  "menuPrice": 10.99,
+  "menuDescription": "BBQ Burger combo with fries and soft drink",
+  "menuImage": "/uploads/single_bbq_burger-min.png"
+}

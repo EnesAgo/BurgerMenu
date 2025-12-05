@@ -44,13 +44,20 @@ export default function LeftSection({addOns, fixedProducts, specialDeals}: LeftS
     }, [fixedProducts]);
 
     return (
-        <div className={"flex justify-between items-stretch w-full h-[65%]"}>
+        <div className={"flex justify-between items-stretch w-full h-[70%]"}>
             <div className="w-[55%] h-full flex items-start">
 
                 <HeroImages className={"z-10 w-full h-full object-contain"} specialDeals={specialDeals} />
             </div>
-            <div className="w-[45%] h-full">
-
+            <div className="w-[45%] h-full flex flex-col">
+                <div className={"flex w-full p-2 gap-5 items-center"}>
+                    <div className={"w-1/2"}>
+                        <img src="/Burgers.png" alt="Burgers" className="w-[50%] pl-2 h-auto"/>
+                    </div>
+                    <div className={"w-1/2"}>
+                        <img src="/Burgers.png" alt="Burgers" className="w-[50%] pl-2 h-auto"/>
+                    </div>
+                </div>
                 <ProductShow products={fixedProducts}/>
             </div>
         </div>

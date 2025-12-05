@@ -31,11 +31,13 @@ export default function LeftSection({addOns, fixedProducts, specialDeals}: LeftS
     console.log("specialDeals data:", specialDeals);
 
     return (
-        <div className={"h-[35%] w-full flex justify-between items-stretch w-full"}>
+        <div className={"h-[30%] w-full px-5 flex justify-between items-stretch w-full"}>
 
-            <div className={"flex-[3] w-full gap-5 flex flex-col justify-around "}>
-                    <h1 className={"z-10 text-[#FEC100] font-[Katibeh] pl-8 text-4xl"}>Add-ons</h1>
-                    <AddOnsSwiper addOns={addOns} className="" />
+            <div className={"flex-[3] w-full flex flex-col justify-around "}>
+                <div className={"w-full"}>
+                    <img src={"/Extras.png"} alt="Extras" className="w-[10%] h-auto"/>
+                </div>
+                <AddOnsSwiper addOns={addOns} className="" />
             </div>
 
 
